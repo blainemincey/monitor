@@ -76,7 +76,7 @@ public class InternetMonitor {
 
         Status status = null;
 
-        if(this.monitor(SYNOLOGY, SSH_PORT) && this.monitor(OPSMGR,SSH_PORT) && this.monitor(ROUTER,WEB_PORT)) {
+        if(this.monitor(srv1, SSH_PORT) && this.monitor(srv2,SSH_PORT) && this.monitor(srv3,WEB_PORT)) {
             logger.info("Network is UP.");
             status = new Status(Status.NETWORK,Status.UP,new java.util.Date());
             StatusToJsonFile.processObject(status);
