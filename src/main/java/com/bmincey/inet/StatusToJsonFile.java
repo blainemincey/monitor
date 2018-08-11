@@ -9,8 +9,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 public class StatusToJsonFile {
+
+    private static final String DONE = ".DONE";
 
     private static final Logger logger = LoggerFactory.getLogger(StatusToJsonFile.class);
 
@@ -30,6 +33,7 @@ public class StatusToJsonFile {
 
         ApplicationProperties appProps = new ApplicationProperties();
         String fileName = appProps.getFileName();
+        String completedFiles = appProps.getCompletedFiles();
 
         ObjectMapper mapper = new ObjectMapper();
 
@@ -38,10 +42,20 @@ public class StatusToJsonFile {
         long timeStamp = System.currentTimeMillis();
 
         try {
+
+            File jsonFile = new File(fileName + timeStamp);
+
             mapper.writeValue(new File(fileName + timeStamp), status);
             String jsonString = mapper.writeValueAsString(status);
             logger.info("Successfully wrote JSON file.");
             logger.info(jsonString);
+
+            // rename file for next step in processing by Camel
+            logger.info("Renaming file: " + jsonFile);
+            File doneFile = new File(completedFiles + timeStamp + DONE);
+            jsonFile.renameTo(doneFile);
+            logger.info("Renamed file to: " + doneFile);
+
         }
         catch (JsonGenerationException jge) {
             logger.error(jge.getMessage());
@@ -54,6 +68,11 @@ public class StatusToJsonFile {
         }
     }
 
+    /**
+     *
+     * @param jsonString
+     * @return
+     */
     public static Status jsonToObject(String jsonString) {
         Status status = null;
 
@@ -82,11 +101,11 @@ public class StatusToJsonFile {
      * @param args
      */
     public static void main(String[] args) {
-       Status status = new Status(Status.INTERNET, Status.UP, new java.util.Date());
-       StatusToJsonFile.processObject(status);
+        Status status = new Status(Status.INTERNET, Status.UP, LocalDateTime.now());
+        StatusToJsonFile.processObject(status);
 
-       // test next method - jsontoobject
-       String jsonString = "{\"networkType\":\"NETWORK\",\"status\":\"UP\",\"dateTime\":1510338450319}";
-       System.out.println(StatusToJsonFile.jsonToObject(jsonString));
+        // test next method - jsontoobject
+        //String jsonString = "{\"networkType\":\"NETWORK\",\"status\":\"UP\",\"dateTime\":1510338450319}";
+        //System.out.println(StatusToJsonFile.jsonToObject(jsonString));
     }
 }

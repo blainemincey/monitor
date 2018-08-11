@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.time.LocalDateTime;
 
 
 /**
@@ -13,27 +14,34 @@ import java.net.Socket;
  */
 public class InternetMonitor {
 
-    // Internet
-    private static final String GOOGLE   = "www.google.com";
-    private static final String AMAZON   = "www.amazon.com";
-
-    // Local network
-    private static final String srv1   = "192.168.1.199";
-    private static final String srv2   = "192.168.1.200";
-    private static final String srv3   = "192.168.1.110";
-
     // Ports
     private static final int SSH_PORT = 22;
     private static final int WEB_PORT = 80;
 
     private final Logger logger = LoggerFactory.getLogger(InternetMonitor.class);
 
+    // load values from Application Properties
+    private String amazon;
+    private String google;
+    private String srv1;
+    private String srv2;
+    private String srv3;
+
 
     /**
      *
      */
     public InternetMonitor() {
-        logger.info("InternetMonitor initialized...");
+        logger.info("InternetMonitor initializing...");
+
+        // load app props
+        ApplicationProperties appProps = new ApplicationProperties();
+        this.amazon = appProps.getAmazon();
+        this.google = appProps.getGoogle();
+        this.srv1 = appProps.getSrv1();
+        this.srv2 = appProps.getSrv2();
+        this.srv3 = appProps.getSrv3();
+
         this.verifyInternet();
         this.verifyNetwork();
     }
@@ -55,15 +63,17 @@ public class InternetMonitor {
 
         Status status = null;
 
-        if(this.monitor(GOOGLE, WEB_PORT) && (this.monitor(AMAZON, WEB_PORT))) {
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        if(this.monitor(this.google, WEB_PORT) && (this.monitor(this.amazon, WEB_PORT))) {
             logger.info("Internet is UP.");
-            status = new Status(Status.INTERNET,Status.UP,new java.util.Date());
+            status = new Status(Status.INTERNET,Status.UP,currentTime);
             StatusToJsonFile.processObject(status);
 
         }
         else {
             logger.error("Internet is DOWN.");
-            status = new Status(Status.INTERNET,Status.DOWN,new java.util.Date());
+            status = new Status(Status.INTERNET,Status.DOWN,currentTime);
             StatusToJsonFile.processObject(status);
         }
 
@@ -76,14 +86,16 @@ public class InternetMonitor {
 
         Status status = null;
 
-        if(this.monitor(srv1, SSH_PORT) && this.monitor(srv2,SSH_PORT) && this.monitor(srv3,WEB_PORT)) {
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        if(this.monitor(this.srv1, SSH_PORT) && this.monitor(this.srv2,SSH_PORT) && this.monitor(this.srv3,WEB_PORT)) {
             logger.info("Network is UP.");
-            status = new Status(Status.NETWORK,Status.UP,new java.util.Date());
+            status = new Status(Status.NETWORK,Status.UP,currentTime);
             StatusToJsonFile.processObject(status);
         }
         else {
             logger.error("Network is DOWN.");
-            status = new Status(Status.NETWORK,Status.DOWN,new java.util.Date());
+            status = new Status(Status.NETWORK,Status.DOWN,currentTime);
             StatusToJsonFile.processObject(status);
         }
     }
@@ -107,7 +119,7 @@ public class InternetMonitor {
             success = true;
         }
         catch (IOException ioe) {
-            logger.error("Error connecting to: " + url + ".  " +ioe.getMessage());
+            logger.error("Error connecting to: " + url + ".  " + ioe.getMessage());
             success = false;
         }
         finally {

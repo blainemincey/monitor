@@ -1,7 +1,8 @@
 package com.bmincey.inet;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
+
 
 public class Status implements Serializable {
 
@@ -12,7 +13,7 @@ public class Status implements Serializable {
 
     private String networkType;
     private String status;
-    private Date dateTime;
+    private LocalDateTime dateTime;
 
     /**
      *
@@ -27,7 +28,7 @@ public class Status implements Serializable {
      * @param status
      * @param dateTime
      */
-    public Status(final String networkType, final String status, final Date dateTime) {
+    public Status(final String networkType, final String status, final LocalDateTime dateTime) {
         this.setNetworkType(networkType);
         this.setStatus(status);
         this.setDateTime(dateTime);
@@ -70,15 +71,15 @@ public class Status implements Serializable {
      *
      * @return
      */
-    public Date getDateTime() {
-        return dateTime;
+    public String getDateTime() {
+        return dateTime + "";
     }
 
     /**
      *
      * @param dateTime
      */
-    public void setDateTime(Date dateTime) {
+    public void setDateTime(LocalDateTime dateTime) {
         this.dateTime = dateTime;
     }
 
@@ -96,7 +97,7 @@ public class Status implements Serializable {
     }
 
     public static void main(String[] args) {
-        Status status = new Status(Status.NETWORK,Status.UP,new java.util.Date());
+        Status status = new Status(Status.NETWORK,Status.UP, LocalDateTime.now());
         System.out.println(status);
     }
 }
