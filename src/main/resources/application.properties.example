@@ -1,0 +1,14 @@
+# Application Properties for Internet Monitor
+
+# Internet addresses
+google.inet.addr=www.google.com
+amazon.inet.addr=www.amazon.com
+
+# Internal network addresses
+# SSH Port (22)
+srv1.inet.addr=
+srv2.inet.addr=
+
+# JSON output file
+output.file.name=
+completed.files=
